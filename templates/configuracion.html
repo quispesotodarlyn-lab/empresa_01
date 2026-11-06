@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Configuración – Creaciones GMD{% endblock %}
+{% block contenido %}
+<div class="pag">
+<div class="vh"><h2>Configuración</h2></div><div class="panel"><h2>Datos del sistema</h2><p style="color:var(--mut);margin:8px 0">Todo se guarda en la base de datos MySQL <b>creaciones_gmd</b> (XAMPP). Puedes verla en phpMyAdmin.</p>
+<div class="vh"><a class="btn g" href="/api/csv/pedidos">⬇ Todos los pedidos (CSV)</a><a class="btn" href="/api/csv/clientes">⬇ Clientes (CSV)</a><a class="btn" href="/api/csv/mensual">⬇ Ganancias por mes</a><a class="btn" href="/api/csv/anual">⬇ Ganancias por año</a></div>
+<div class="vh"><button class="btn o" onclick="twoStep(this,function(){api('POST','/api/demo').then(function(){toast('Datos de ejemplo cargados')},falla)})">Cargar datos de ejemplo</button><button class="btn d" onclick="twoStep(this,function(){api('POST','/api/borrar').then(function(){toast('Clientes y pedidos borrados')},falla)})">Borrar clientes y pedidos</button></div></div>
+</div>
+{% endblock %}
+{% block js %}<script>
+
+</script>{% endblock %}

@@ -1,0 +1,56 @@
+-- La app crea esto sola al iniciar. También puedes importarlo en phpMyAdmin.
+CREATE DATABASE IF NOT EXISTS creaciones_gmd CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE creaciones_gmd;
+
+CREATE TABLE IF NOT EXISTS clientes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(150) NOT NULL UNIQUE,
+  telefono VARCHAR(40) DEFAULT '',
+  correo VARCHAR(120) DEFAULT '',
+  direccion VARCHAR(200) DEFAULT '',
+  creado DATE NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS productos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL UNIQUE,
+  unidad VARCHAR(20) NOT NULL DEFAULT 'm²',
+  precio DECIMAL(10,2) NOT NULL DEFAULT 0
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS materiales (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS pedidos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  cliente_id INT NOT NULL,
+  producto VARCHAR(100) NOT NULL,
+  ancho DECIMAL(8,2) NOT NULL DEFAULT 0,
+  alto DECIMAL(8,2) NOT NULL DEFAULT 0,
+  cantidad DECIMAL(8,2) NOT NULL DEFAULT 1,
+  material VARCHAR(100) DEFAULT '',
+  total DECIMAL(10,2) NOT NULL DEFAULT 0,
+  fecha DATE NOT NULL,
+  estado CHAR(1) NOT NULL DEFAULT 'P',
+  notas TEXT,
+  INDEX (fecha), INDEX (cliente_id),
+  CONSTRAINT fk_ped_cli FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS publicaciones (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  titulo VARCHAR(200) NOT NULL,
+  descripcion TEXT,
+  categoria VARCHAR(100) DEFAULT '',
+  fecha DATE NOT NULL,
+  estado VARCHAR(20) DEFAULT 'Publicada'
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS actividades (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  icono VARCHAR(10), color VARCHAR(10),
+  texto VARCHAR(200), detalle VARCHAR(200),
+  ts BIGINT NOT NULL
+) ENGINE=InnoDB;

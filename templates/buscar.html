@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titulo %}Búsqueda – Creaciones GMD{% endblock %}
+{% block contenido %}
+<div class="pag">
+<div class="vh"><h2 id="tt">Resultados</h2><a class="btn g" id="csv" href="#">⬇ CSV de resultados</a></div><div id="kp"></div><div id="cl"></div><div class="panel"><h2>Compras: fecha, medidas, material y total</h2><div id="tabla"></div></div>
+</div>
+{% endblock %}
+{% block js %}<script>
+var Q=new URLSearchParams(location.search).get('q')||'';
+function recargar(){$('tt').textContent='Resultados para “'+Q+'”';$('csv').href='/api/csv/buscar?q='+encodeURIComponent(Q);
+api('GET','/api/buscar?q='+encodeURIComponent(Q)).then(function(r){$('kp').innerHTML=resumen(r.pedidos);
+$('cl').innerHTML=r.clientes.length?'<div class="panel"><h2>Clientes</h2>'+r.clientes.map(function(c){return '<span class="chip" data-cl="'+c.id+'">'+esc(c.nombre)+'</span>'}).join('')+'</div><br>':'';
+$('tabla').innerHTML=tablaPedidos(r.pedidos)},falla)}
+recargar();
+</script>{% endblock %}

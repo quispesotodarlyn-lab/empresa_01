@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block titulo %}Productos / Servicios – Creaciones GMD{% endblock %}
+{% block contenido %}
+<div class="pag">
+<div class="vh"><h2>Productos / Servicios</h2><button class="btn o" onclick="formProd()">＋ Nuevo producto</button></div>
+<div class="panel tw"><table><thead><tr><th>Nombre</th><th>Se cobra por</th><th>Precio</th><th>Pedidos</th><th></th></tr></thead><tbody id="tb"></tbody></table></div><br>
+<div class="vh"><h2 style="font-size:18px">Tipos de material</h2><div class="fi"><input id="nm" placeholder="Nuevo material (ej: Canvas)" style="background:#122049;border:1px solid var(--line);border-radius:8px;padding:9px;color:var(--tx);font:13px Poppins"><button class="btn o" onclick="addMat()">＋ Agregar</button></div></div>
+<div class="panel tw"><table><thead><tr><th>Material</th><th>Pedidos</th><th></th></tr></thead><tbody id="tm"></tbody></table></div>
+</div>
+{% endblock %}
+{% block js %}<script>
+function recargar(){api('GET','/api/productos').then(function(L){$('tb').innerHTML=L.map(function(p){return '<tr><td>'+esc(p.nombre)+'</td><td>'+p.unidad+'</td><td>S/ '+money(p.precio)+'</td><td>'+p.pedidos+'</td><td><button class="btn k" onclick="formProd('+p.id+')">Editar</button> <button class="btn d" onclick="twoStep(this,function(){api(\'DELETE\',\'/api/productos/'+p.id+'\').then(recargar,falla)})">Eliminar</button></td></tr>'}).join('')},falla);
+api('GET','/api/materiales').then(function(L){$('tm').innerHTML=L.map(function(m){return '<tr><td>'+esc(m.nombre)+'</td><td>'+m.pedidos+'</td><td><button class="btn d" onclick="twoStep(this,function(){api(\'DELETE\',\'/api/materiales/'+m.id+'\').then(recargar,falla)})">Eliminar</button></td></tr>'}).join('')},falla)}
+function addMat(){var n=$('nm').value.trim();if(!n)return;api('POST','/api/materiales',{nombre:n}).then(function(){$('nm').value='';recargar()},falla)}
+recargar();
+</script>{% endblock %}

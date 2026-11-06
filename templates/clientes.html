@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Clientes – Creaciones GMD{% endblock %}
+{% block contenido %}
+<div class="pag">
+<div class="vh"><h2>Clientes</h2><button class="btn o" onclick="formCliente()">＋ Nuevo cliente</button><a class="btn g" href="/api/csv/clientes">⬇ CSV</a></div>
+<div class="panel tw"><table><thead><tr><th>Cliente</th><th>Teléfono</th><th>Pedidos</th><th>Total comprado</th><th>Última compra</th></tr></thead><tbody id="tb"></tbody></table></div>
+</div>
+{% endblock %}
+{% block js %}<script>
+function recargar(){api('GET','/api/clientes').then(function(L){$('tb').innerHTML=L.map(function(c){return '<tr data-cl="'+c.id+'"><td>'+esc(c.nombre)+'</td><td>'+esc(c.telefono||'—')+'</td><td>'+c.pedidos+'</td><td>S/ '+money(c.total)+'</td><td>'+fd(c.ultima)+'</td></tr>'}).join('')||'<tr><td colspan="5" style="color:var(--mut)">Aún no hay clientes.</td></tr>'},falla)}
+recargar();
+</script>{% endblock %}

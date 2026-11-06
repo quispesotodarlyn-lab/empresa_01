@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block titulo %}Reportes – Creaciones GMD{% endblock %}
+{% block contenido %}
+<div class="pag">
+<div class="vh"><h2>Reportes de ganancias</h2><label class="fi" style="display:flex">Año <select id="an"></select></label><a class="btn g" href="/api/csv/pedidos">⬇ Todo (CSV)</a><a class="btn" href="/api/csv/mensual">⬇ Por mes</a><a class="btn" href="/api/csv/anual">⬇ Por año</a><a class="btn k" href="/api/csv/clientes">⬇ Clientes</a></div>
+<div id="kp"></div><div class="panel"><h2 id="tm"></h2><div id="bm"></div></div><br>
+<div class="mid"><div class="panel tw"><h2>Detalle por mes</h2><table><thead><tr><th>Mes</th><th>Pedidos</th><th>Ventas</th><th>vs mes anterior</th></tr></thead><tbody id="dm"></tbody></table></div>
+<div class="col"><div class="panel"><h2>Ganancias por año</h2><div id="ba"></div><table><tbody id="da"></tbody></table></div><div class="panel"><h2 id="tp"></h2><table><tbody id="dp"></tbody></table></div></div></div>
+</div>
+{% endblock %}
+{% block js %}<script>
+var Y=new Date().getFullYear();
+function recargar(){api('GET','/api/reportes?anio='+Y).then(function(r){var m=r.mensual,T=0,C=0,N=0,best=0;
+m.forEach(function(x,i){T+=x.ventas;C+=x.cobrado;N+=x.pedidos;if(x.ventas>m[best].ventas)best=i});
+$('an').innerHTML=r.anios.map(function(a){return '<option'+(a==Y?' selected':'')+'>'+a+'</option>'}).join('');
+$('kp').innerHTML=kp([['Ventas '+Y,'S/ '+money(T)],['Cobrado (completados)','S/ '+money(C)],['Por cobrar (en proceso)','S/ '+money(T-C)],['Pedidos',N],['Promedio por mes','S/ '+money(T/12)],['Mejor mes',T?m[best].mes:'—']]);
+$('tm').textContent='Ganancias por mes – '+Y;$('bm').innerHTML=bars(m.map(function(x){return {l:x.mes.slice(0,3),v:x.ventas}}));
+$('dm').innerHTML=m.map(function(x,i){var pv=i?m[i-1].ventas:0,pc=pv?Math.round((x.ventas-pv)/pv*100):null;return '<tr><td>'+x.mes+'</td><td>'+x.pedidos+'</td><td>S/ '+money(x.ventas)+'</td><td style="color:'+(pc==null?'inherit':pc>=0?'#25e07a':'#ff6b6b')+'">'+(pc==null?'—':(pc>=0?'+':'')+pc+'%')+'</td></tr>'}).join('');
+$('ba').innerHTML=bars(r.anual.map(function(x){return {l:String(x.anio),v:x.ventas}}));
+$('da').innerHTML=r.anual.map(function(x){return '<tr><td>'+x.anio+'</td><td>'+x.pedidos+' pedidos</td><td>S/ '+money(x.ventas)+'</td></tr>'}).join('');
+$('tp').textContent='Por producto – '+Y;$('dp').innerHTML=r.productos.map(function(x){return '<tr><td>'+esc(x.producto)+'</td><td>'+x.pedidos+' pedidos</td><td>S/ '+money(x.ventas)+'</td></tr>'}).join('');
+$('an').onchange=function(){Y=+this.value;recargar()}},falla)}
+recargar();
+</script>{% endblock %}

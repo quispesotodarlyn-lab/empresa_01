@@ -1,0 +1,35 @@
+CREACIONES GMD - HTML + Python (Flask) + JavaScript + Base de datos MySQL (XAMPP)
+
+REQUISITOS
+1. XAMPP (para MySQL)  2. Python 3.9+ (marca "Add Python to PATH")
+
+PASOS
+1. Abre XAMPP y pulsa START en MySQL.
+2. Doble clic en iniciar.bat   (o:  pip install -r requirements.txt  y  python app.py)
+3. Entra a http://localhost:5000
+4. Ver la base de datos: http://localhost/phpmyadmin  ->  creaciones_gmd
+
+REGISTRAR UNA VENTA:  Pedidos -> "Nueva venta": nombre del cliente, producto,
+ancho y alto (m), cantidad, TIPO DE MATERIAL, fecha. El total se calcula solo.
+Buscar: escribe un cliente, fecha (20/06/2026, 06/2026, junio 2026), producto o medida (3x2).
+
+UN HTML POR SECCION (carpeta templates/)
+base.html            diseño comun: menu, buscador, banner (se repite en todas)
+inicio.html          Inicio (dashboard)
+publicaciones.html   Publicaciones
+clientes.html        Clientes
+pedidos.html         Pedidos / ventas
+productos.html       Productos / Servicios y tipos de material
+reportes.html        Ganancias por mes y por año
+configuracion.html   Descargas, datos de ejemplo, borrar datos
+buscar.html          Resultados de la busqueda
+
+OTROS ARCHIVOS
+app.py               Python: paginas, API y conexion a MySQL
+config.py            usuario/clave de MySQL (por defecto root sin clave)
+schema.sql           tablas (se crean solas al iniciar)
+static/js/comun.js   JavaScript compartido (formularios, tablas, graficos)
+static/img/          logo y fondo del banner
+
+TABLAS: clientes, pedidos, productos, materiales, publicaciones, actividades.
+Desde otra PC de la red: http://IP-DE-TU-PC:5000

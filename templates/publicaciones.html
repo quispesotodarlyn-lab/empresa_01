@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}Publicaciones – Creaciones GMD{% endblock %}
+{% block contenido %}
+<div class="pag">
+<div class="vh"><h2>Publicaciones</h2><button class="btn o" onclick="formPub()">＋ Nueva publicación</button></div><div class="gridc" id="g"></div>
+</div>
+{% endblock %}
+{% block js %}<script>
+function recargar(){api('GET','/api/publicaciones').then(function(L){$('g').innerHTML=L.map(function(b){return '<div class="panel"><b>'+esc(b.titulo)+'</b><p style="color:var(--mut);font-size:12px;margin:6px 0">'+esc(b.descripcion)+'</p><small>'+esc(b.categoria)+' · '+fd(b.fecha)+'</small><br><span class="st '+(b.estado=='Publicada'?'ok':'p')+'">'+b.estado+'</span><div class="row2"><button class="btn k" onclick="formPub('+b.id+')">Editar</button><button class="btn d" onclick="twoStep(this,function(){api(\'DELETE\',\'/api/publicaciones/'+b.id+'\').then(recargar,falla)})">Eliminar</button></div></div>'}).join('')||'<p style="color:var(--mut)">Aún no hay publicaciones.</p>'},falla)}
+recargar();
+</script>{% endblock %}

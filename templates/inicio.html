@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block titulo %}Inicio – Creaciones GMD{% endblock %}
+{% block contenido %}
+<div class="body">
+<div class="left">
+<div class="cards">
+<div class="card c1"><div class="ic">📣</div><h3>Publicaciones</h3><div class="n" id="n1">24</div><div class="d">⬆ <b>+3 este mes</b></div><button onclick="irA('Publicaciones')">Ver publicaciones →</button></div>
+<div class="card c2"><div class="ic">👥</div><h3>Clientes</h3><div class="n" id="n2">18</div><div class="d">⬆ <b>+5 este mes</b></div><button onclick="irA('Clientes')">Ver clientes →</button></div>
+<div class="card c3"><div class="ic">🛒</div><h3>Pedidos en proceso</h3><div class="n" id="n3">6</div><div class="d">⬆ <b>+2 este mes</b></div><button onclick="irA('Pedidos')">Ver pedidos →</button></div>
+<div class="card c4"><div class="ic">✔</div><h3>Completados</h3><div class="n" id="n4">32</div><div class="d">⬆ <b>+8 este mes</b></div><button onclick="irA('Reportes')">Ver historial →</button></div>
+</div>
+<div class="mid">
+<div class="col">
+<div class="panel"><h2>📊 Resumen de Ventas <select id="rng" aria-label="Rango"><option>Últimos 7 días</option><option>Últimos 30 días</option></select></h2>
+<div class="big">S/ <span id="tot">12,480.00</span> <small>⬆ +12% <span>que la semana pasada</span></small></div>
+<div class="chart"><svg id="ch" viewBox="0 0 400 190"></svg><div class="lg" id="lg"></div></div></div>
+<div class="panel"><h2>👑 Clientes destacados <a onclick="irA('Clientes')">Ver todos →</a></h2>
+<div class="fc" id="fc"></div></div>
+</div>
+<div class="panel"><h2>📋 Pedidos recientes <a onclick="irA('Pedidos')">Ver todos →</a></h2>
+<table><thead><tr><th>N°</th><th>Cliente</th><th>Producto</th><th>Estado</th><th>Fecha</th></tr></thead><tbody id="tb"></tbody></table></div>
+</div>
+</div>
+<div class="right">
+<div class="promo"><div class="t">Grandes proyectos<br>comienzan con<br>una buena idea 👑</div><button onclick="irA('Publicaciones')">＋ Crear nueva publicación</button></div>
+<div class="panel"><h2>⚡ Accesos rápidos</h2>
+<div class="quick">
+<button style="background:linear-gradient(150deg,#7a3dff,#4a1fd0)"><span>📣</span>Nueva<br>Publicación</button>
+<button style="background:linear-gradient(150deg,#1ab0ff,#1270ee)"><span>👥</span>Nuevo<br>Cliente</button>
+<button style="background:linear-gradient(150deg,#ffa01a,#ff7300)"><span>🛒</span>Nuevo<br>Pedido</button>
+<button style="background:linear-gradient(150deg,#ff3fa8,#ee1f78)"><span>🏷</span>Nuevo<br>Producto</button>
+</div></div>
+<div class="panel"><h2>🕒 Últimas actividades <a onclick="verActividades()">Ver todas →</a></h2>
+<div id="ac"></div></div>
+</div>
+</div>
+
+{% endblock %}
+{% block js %}<script>
+var HR=0;
+function recargar(){api('GET','/api/dashboard?dias='+(HR?30:7)).then(pintar,falla)}
+function pintar(d){var b=document.querySelectorAll('.card .d b');
+$('n1').textContent=d.publicaciones;$('n2').textContent=d.clientes;$('n3').textContent=d.proceso;$('n4').textContent=d.completados;
+b[0].textContent='+'+d.mes_pub+' este mes';b[1].textContent='+'+d.mes_cli+' este mes';b[2].textContent='+'+d.mes_proceso+' este mes';b[3].textContent='+'+d.mes_completados+' este mes';
+$('tot').textContent=money(d.total);var pc=d.previo?Math.round((d.total-d.previo)/d.previo*100):0;
+document.querySelector('.big small').innerHTML=(pc>=0?'⬆ +':'⬇ ')+pc+'% <span>que '+(HR?'el mes pasado':'la semana pasada')+'</span>';
+var cols=['#1a8cff','#00d0ff','#ff8a65','#2ee67a','#ff2fa8'],mx=0,i,s='';d.series.forEach(function(x){x.v.forEach(function(v){mx=Math.max(mx,v)})});var M=nice(Math.max(mx,4)/4)*4;
+for(i=0;i<=4;i++){var y=170-i*40;s+='<line x1="40" x2="390" y1="'+y+'" y2="'+y+'" stroke="#1b2a52"/><text x="34" y="'+(y+3)+'" fill="#9fb0d6" font-size="9" text-anchor="end">'+sh(M*i/4)+'</text>'}
+d.series.slice().reverse().forEach(function(x,k){var ix=d.series.length-1-k,p=x.v.map(function(v,j){return [40+j*350/6,170-v/M*160]}),path='M'+p[0][0]+','+p[0][1];
+for(var j=1;j<7;j++){var cx=(p[j-1][0]+p[j][0])/2;path+=' C'+cx+','+p[j-1][1]+' '+cx+','+p[j][1]+' '+p[j][0]+','+p[j][1]}
+s+='<path d="'+path+' L390,170 L40,170Z" fill="'+cols[ix]+'" fill-opacity=".5" stroke="'+cols[ix]+'" stroke-width="1.5"/>'});
+d.etiquetas.forEach(function(l,j){s+='<text x="'+(40+j*350/6)+'" y="186" fill="#9fb0d6" font-size="9" text-anchor="middle">'+l+'</text>'});
+$('ch').innerHTML=s;$('lg').innerHTML=d.series.map(function(x,k){return '<div><i style="background:'+cols[k]+'"></i>'+esc(x.n)+'</div>'}).join('');
+$('tb').innerHTML=d.recientes.map(function(o){return '<tr data-id="'+o.id+'" style="cursor:pointer"><td>#'+pad(o.id)+'</td><td>'+esc(o.cliente)+'</td><td>'+esc(o.producto)+'</td><td>'+chip(o)+'</td><td>'+fd(o.fecha)+'</td></tr>'}).join('');
+$('fc').innerHTML=d.destacados.map(function(c){var w=c.nombre.split(' ');return '<div data-cl="'+c.id+'" style="cursor:pointer"><div class="a">'+esc((w[0][0]+(w[1]?w[1][0]:'')).toUpperCase())+'</div>'+esc(c.nombre)+'<small>'+c.pedidos+' pedidos</small></div>'}).join('');
+$('ac').innerHTML=d.actividades.map(function(a){return '<div class="act"><div class="i" style="background:'+a.col+'">'+a.i+'</div><div>'+esc(a.t)+'<small>'+esc(a.s)+' • '+ago(a.ts)+'</small></div></div>'}).join('')}
+var qb=document.querySelectorAll('.quick button');qb[0].onclick=function(){formPub()};qb[1].onclick=function(){formCliente()};qb[2].onclick=function(){nuevoPedido()};qb[3].onclick=function(){formProd()};
+document.querySelector('.promo button').onclick=function(){formPub()};
+$('rng').onchange=function(){HR=this.selectedIndex;recargar()};
+recargar();
+</script>{% endblock %}
